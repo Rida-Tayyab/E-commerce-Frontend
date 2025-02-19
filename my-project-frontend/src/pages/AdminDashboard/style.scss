@@ -1,0 +1,153 @@
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  Typography,
+  TextField,
+  Button,
+  Box,
+  CircularProgress,
+  Alert,
+  Grid,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  Select,
+  MenuItem,
+} from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+
+export default function AdminDashboard() {
+  const [orders, setOrders] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetchOrders();
+    fetchProducts();
+  }, []);
+
+  const fetchOrders = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/admin/orders");
+      if (!response.ok) throw new Error("Failed to fetch orders.");
+      const data = await response.json();
+      setOrders(data);
+    } catch (error) {
+      setError("Failed to fetch orders.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchProducts = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/admin/products");
+      if (!response.ok) throw new Error("Failed to fetch products.");
+      const data = await response.json();
+      setProducts(data);
+    } catch (error) {
+      setError("Failed to fetch products.");
+    }
+  };
+
+  const updateOrderStatus = async (orderId, status) => {
+    await fetch(`http://localhost:5000/admin/orders/${orderId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status }),
+    });
+    fetchOrders();
+  };
+
+  const deleteProduct = async (productId) => {
+    await fetch(`http://localhost:5000/admin/products/${productId}`, {
+      method: "DELETE",
+    });
+    fetchProducts();
+  };
+
+  return (
+    <Box display="flex" minHeight="100vh" bgcolor="#121212" color="white" p={3}>
+      <Box width="250px" bgcolor="#1e1e1e" p={2} borderRadius={2} mr={3}>
+        <Typography variant="h6" mb={2}>Admin Panel</Typography>
+        <List>
+          <ListItem disablePadding>
+            <ListItemButton>
+              <ListItemText primary="Orders" />
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding>
+            <ListItemButton>
+              <ListItemText primary="Products" />
+            </ListItemButton>
+          </ListItem>
+        </List>
+      </Box>
+      <Box flex={1}>
+        <Typography variant="h5" color="white" mb={3} textAlign="center">
+          Orders
+        </Typography>
+        {loading ? (
+          <CircularProgress />
+        ) : error ? (
+          <Alert severity="error">{error}</Alert>
+        ) : (
+          <Grid container spacing={3}>
+            {orders.map((order) => (
+              <Grid item xs={12} key={order.id}>
+                <Card sx={{ bgcolor: "#1e1e1e", color: "white", p: 2 }}>
+                  <CardContent>
+                    <Typography variant="h6">Order #{order.id}</Typography>
+                    <Typography variant="body2">{order.customer}</Typography>
+                    <Select
+                      value={order.status}
+                      onChange={(e) => updateOrderStatus(order.id, e.target.value)}
+                      sx={{ color: "white" }}
+                    >
+                      <MenuItem value="Pending">Pending</MenuItem>
+                      <MenuItem value="Shipped">Shipped</MenuItem>
+                      <MenuItem value="Delivered">Delivered</MenuItem>
+                    </Select>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        )}
+
+        <Typography variant="h5" color="white" mt={4} mb={3} textAlign="center">
+          Products
+        </Typography>
+        <Grid container spacing={3}>
+          {products.map((product) => (
+            <Grid item xs={12} sm={6} md={4} key={product.id}>
+              <Card sx={{ bgcolor: "#1e1e1e", color: "white", p: 2 }}>
+                <CardContent>
+                  <Typography variant="h6">{product.name}</Typography>
+                  <Typography variant="body2">Rs. {product.price}</Typography>
+                  <Button
+                    startIcon={<EditIcon />}
+                    sx={{ color: "#77B0AA" }}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    startIcon={<DeleteIcon />}
+                    sx={{ color: "red" }}
+                    onClick={() => deleteProduct(product.id)}
+                  >
+                    Delete
+                  </Button>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
+    </Box>
+  );
+}

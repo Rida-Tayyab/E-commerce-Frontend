@@ -1,0 +1,22 @@
+@import "../../global.scss";
+
+#login {
+    background-color: $secondary-light;
+}
+
+@media screen and (max-width: 786px) {
+    #login {
+        background-color: white;
+        #login-card {
+            width: 100%;
+            box-shadow: none !important;
+
+            div:first-child {
+                display: none;
+            }
+            form {
+                width: 100%;
+            }
+        }
+    }
+}

@@ -1,0 +1,96 @@
+.profile-container {
+    background: linear-gradient(to bottom, #77b0aa, #135d66, #003c43);
+    height: 100vh;
+    color: white;
+    padding: 2rem;
+  }
+  
+  .profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+  
+  .back-button {
+    display: flex;
+    align-items: center;
+    font-size: 1.125rem;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  
+  .profile-icon img {
+    height: 2.5rem;
+    width: 2.5rem;
+  }
+  
+  section {
+    margin-bottom: 1.5rem;
+  }
+  
+  .section-title {
+    color: #003c43;
+  }
+  
+  .personal-info-and-image {
+    background-color: white;
+    color: #003c43;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .profile-image img {
+    border-radius: 50%;
+    height: 8rem;
+    width: 8rem;
+    object-fit: cover;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .profile-details {
+    text-align: left;
+  }
+  
+  .profile-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+  
+  .profile-email,
+  .profile-phone {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+  }
+  
+  .account-settings {
+    background-color: white;
+    color: #003c43;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+  }
+  
+  button:hover {
+    background-color: #003c43;
+    color: white;
+    border-radius: 0.25rem;
+  }
+  

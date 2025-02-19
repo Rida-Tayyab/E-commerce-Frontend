@@ -1,0 +1,33 @@
+@import "../../global.scss";
+
+#loader {
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    span:first-child {
+        position: absolute;
+        display: block;
+        border: 1px solid $primary-light;
+        border-radius: 50%;
+        border-top: 3px solid transparent;
+        animation: spin 2s linear infinite;
+    }
+    span {
+        position: absolute;
+        display: block;
+        border: 3px solid $primary-light;
+        border-radius: 50%;
+        border-bottom: 3px solid transparent;
+        animation: spin 2s linear infinite;
+        animation-direction: reverse;
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+}

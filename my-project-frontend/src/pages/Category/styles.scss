@@ -1,0 +1,206 @@
+// General Styles
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+}
+
+h2, h3 {
+  font-family: 'Arial', sans-serif;
+}
+
+.bg-gradient {
+  background: linear-gradient(to bottom, #77B0AA, #135D66, #003C43);
+}
+
+// Navbar Styles
+.navbar {
+  background-color: white;
+  color: #003C43;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar .logo {
+  height: 2.5rem;
+}
+
+.navbar .search-container {
+  display: flex;
+  align-items: center;
+}
+
+.navbar input[type="text"] {
+  width: 20rem;
+  padding: 0.5rem;
+  border-radius: 25px;
+  border: 1px solid #ccc;
+  margin-right: 1rem;
+  outline: none;
+}
+
+.navbar button {
+  background-color: #77B0AA;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 25px;
+  border: none;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.navbar button:hover {
+  background-color: #66A79E;
+}
+
+.navbar .user-info {
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.navbar .cart {
+  display: flex;
+  align-items: center;
+  margin-right: 1.5rem;
+}
+
+.navbar .cart img, .navbar .user-info img {
+  height: 1.5rem;
+  width: 1.5rem;
+  margin-right: 0.5rem;
+}
+
+// Dashboard Main Content
+.dashboard {
+  padding: 2rem;
+}
+
+.dashboard h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+}
+
+.dashboard .category-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.dashboard .category-card {
+  background-color: white;
+  text-align: center;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.dashboard .category-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.dashboard .category-card .icon {
+  font-size: 3rem;
+  margin-bottom: 1.5rem;
+}
+
+.dashboard .category-card h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.dashboard .category-card p {
+  font-size: 1rem;
+  color: #777;
+  margin-top: 1rem;
+}
+
+// Category Items Section
+.items-section {
+  margin-top: 3rem;
+}
+
+.items-section .item-card {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.items-section .item-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.items-section .item-card img {
+  width: 100%;
+  height: auto;
+  max-height: 150px;
+  object-fit: cover;
+  margin-bottom: 1rem;
+}
+
+.items-section .item-card h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.items-section .item-card p {
+  color: #777;
+  margin-bottom: 1rem;
+}
+
+.items-section .item-card button {
+  background-color: #77B0AA;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 25px;
+  border: none;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.items-section .item-card button:hover {
+  background-color: #66A79E;
+}
+
+// Back to Dashboard Button
+.back-btn {
+  margin-top: 2rem;
+  background-color: #003C43;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 25px;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+
+.back-btn:hover {
+  background-color: #001C1C;
+}
+
+// Responsive Styles
+@media (min-width: 768px) {
+  .dashboard .category-cards {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}

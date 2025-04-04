@@ -9,6 +9,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import './global.scss'
 import store from './store';
 import { Provider } from 'react-redux';
+import Home from './pages/Home/index.jsx';
 import Login from './pages/loginpage/index.jsx';
 import Signup from './pages/Signup/index.jsx';
 import DashBoard from './pages/DashBoard/index.jsx';
@@ -16,7 +17,8 @@ import Category from './pages/Category/index.jsx';
 import Cart from './pages/Cart/index.jsx';
 import ItemDetails from './pages/ItemDetails/index.jsx';
 import Profile from './pages/Profile/index.jsx';
-import AdminDashboard from './pages/AdminDashboard/index.jsx';
+import SellerDashboard from './pages/SellerDashboard/index.jsx';
+import RegisterStore from './pages/RegisterStore/index.jsx';
 
 const AppContext = React.createContext({});
 
@@ -37,11 +39,15 @@ const theme = createTheme({
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <Login />,
+        element: <Home />,
     },
     {
         path: "/login",
         element: <Login />,
+    },
+    {
+        path: "/regstore",
+        element: <RegisterStore />,
     },
     {
         path: "/signup",
@@ -68,8 +74,8 @@ const router = createBrowserRouter([
         element: <Profile/>,
     },
     {
-        path:"/admin-dashboard",
-        element: <AdminDashboard/>,
+        path:"/seller-dashboard",
+        element: <SellerDashboard/>,
     }
 ]);
 

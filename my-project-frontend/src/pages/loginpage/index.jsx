@@ -38,9 +38,9 @@ const Login = () => {
       if (response.ok) {
         localStorage.setItem("user", JSON.stringify(data.user));
         setMessage("Login successful!");
-        if (data.user.isAdmin) {
-          console.log("Redirecting to Admin Dashboard...");
-          navigate("/admin-dashboard");
+        if (data.user.role=="Seller") {
+          console.log("Redirecting to Seller Dashboard...");
+          navigate("/seller-dashboard");
         } else {
           console.log("Redirecting to Customer Dashboard...");
           navigate("/Dashboard");

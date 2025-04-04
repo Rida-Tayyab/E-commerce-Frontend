@@ -31,7 +31,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import MenuIcon from "@mui/icons-material/Menu";
 
-export default function AdminDashboard() {
+export default function SellerDashboard() {
   const [activeTab, setActiveTab] = useState("Order");
   const [orders, setOrders] = useState([]);
   const [products, setProducts] = useState([]);

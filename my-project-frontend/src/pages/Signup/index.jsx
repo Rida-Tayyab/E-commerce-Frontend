@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { Card, CardContent, Typography, TextField, Button, Box, CircularProgress, Alert, useMediaQuery } from "@mui/material";
+import { Card, CardContent, Typography, TextField, Button, Box, CircularProgress, Alert, useMediaQuery, MenuItem, Select, FormControl, InputLabel } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import back from "../../assets/back.jpg";
 
 const Signup = () => {
-    const [formData, setFormData] = useState({ name: "", email: "", password: "" });
+    const [formData, setFormData] = useState({ name: "", email: "", password: "", role: "" });
     const [message, setMessage] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const theme = useTheme();
@@ -26,7 +26,7 @@ const Signup = () => {
             });
             if (response.ok) {
                 setMessage("Registration successful!");
-                setFormData({ name: "", email: "", password: "" });
+                setFormData({ name: "", email: "", password: "", role: "" });
             } else {
                 const data = await response.json();
                 setMessage(data.message || "Registration failed.");
@@ -79,7 +79,7 @@ const Signup = () => {
                                 value={formData.name}
                                 onChange={handleChange}
                                 required
-                                InputLabelProps={{ style: { color: "#e0e0e0" } }}
+                                InputLabelProps={{ shrink: formData.name !== "" || undefined, style: { color: "#e0e0e0" } }}
                                 InputProps={{
                                     style: { color: "#e0e0e0", backgroundColor: "#2a2a2a", borderRadius: 6 },
                                 }}
@@ -95,13 +95,13 @@ const Signup = () => {
                                 value={formData.email}
                                 onChange={handleChange}
                                 required
-                                InputLabelProps={{ style: { color: "#e0e0e0" } }}
+                                InputLabelProps={{ shrink: formData.email !== "" || undefined, style: { color: "#e0e0e0" } }}
                                 InputProps={{
                                     style: { color: "#e0e0e0", backgroundColor: "#2a2a2a", borderRadius: 6 },
                                 }}
                             />
                         </Box>
-                        <Box mb={3}>
+                        <Box mb={2}>
                             <TextField
                                 fullWidth
                                 label="Password"
@@ -111,11 +111,30 @@ const Signup = () => {
                                 value={formData.password}
                                 onChange={handleChange}
                                 required
-                                InputLabelProps={{ style: { color: "#e0e0e0" } }}
+                                InputLabelProps={{ shrink: formData.password !== "" || undefined, style: { color: "#e0e0e0" } }}
                                 InputProps={{
                                     style: { color: "#e0e0e0", backgroundColor: "#2a2a2a", borderRadius: 6 },
                                 }}
                             />
+                        </Box>
+                        <Box mb={3}>
+                            <FormControl fullWidth variant="outlined">
+                                <InputLabel sx={{ color: "#e0e0e0" }}>Role</InputLabel>
+                                <Select
+                                    name="role"
+                                    value={formData.role}
+                                    onChange={handleChange}
+                                    required
+                                    sx={{
+                                        color: "#e0e0e0",
+                                        backgroundColor: "#2a2a2a",
+                                        borderRadius: 6,
+                                    }}
+                                >
+                                    <MenuItem value="User">User</MenuItem>
+                                    <MenuItem value="Seller">Seller</MenuItem>
+                                </Select>
+                            </FormControl>
                         </Box>
                         <Button
                             type="submit"
@@ -131,16 +150,10 @@ const Signup = () => {
                         >
                             {isLoading ? <CircularProgress size={24} color="inherit" /> : "Sign Up"}
                         </Button>
-                        <p className="text-base mt-5 mb-5 text-center text-white">
-                            <span>Already a Member?</span>
-                                <Button
-                                    type="link"
-                                    className="text-base p-1"
-                                    href="/login"
-                                >
-                                    Login
-                                </Button>
-                        </p>
+                        <Typography textAlign="center" mt={3} color="#e0e0e0">
+                            Already a Member?
+                            <Button href="/login" sx={{ color: "#008080", ml: 1 }}>Login</Button>
+                        </Typography>
                     </form>
                 </CardContent>
             </Card>

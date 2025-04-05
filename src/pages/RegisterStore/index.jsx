@@ -7,7 +7,7 @@ import back from "../../assets/back.jpg";
 
 const StoreSignup = () => {
     const [formData, setFormData] = useState({
-        businessName: "", ownerName: "", ownerEmail: "", businessType: "", NTN: "",
+        businessName: "", ownerName: "", ownerEmail: "",password : "", businessType: "", NTN: "",
         contactEmail: "", phone: "", website: "", logoUrl: "", description: "",
         street: "", city: "", state: "", postalCode: "", country: ""
     });
@@ -30,6 +30,7 @@ const StoreSignup = () => {
             businessName: formData.businessName,
             ownerName: formData.ownerName,
             ownerEmail: formData.ownerEmail,
+            password: formData.password,
             businessType: formData.businessType,
             NTN: formData.NTN,
             contactEmail: formData.contactEmail,
@@ -47,7 +48,7 @@ const StoreSignup = () => {
         };
 
         try {
-            const response = await fetch("http://localhost:5000/store/register-store", {
+            const response = await fetch("http://localhost:5000/api/auth/register-store", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(storePayload),
@@ -56,7 +57,7 @@ const StoreSignup = () => {
             if (response.ok) {
                 setMessage("Store registered successfully!");
                 setFormData({
-                    businessName: "", ownerName: "", ownerEmail: "", businessType: "", NTN: "",
+                    businessName: "", ownerName: "", ownerEmail: "",password: "", businessType: "", NTN: "",
                     contactEmail: "", phone: "", website: "", logoUrl: "", description: "",
                     street: "", city: "", state: "", postalCode: "", country: ""
                 });
@@ -112,6 +113,7 @@ const StoreSignup = () => {
                             { name: "businessName", label: "Business Name" },
                             { name: "ownerName", label: "Owner Name" },
                             { name: "ownerEmail", label: "Owner Email", type: "email" },
+                            {name:"password", label:"Password", type:"password"},
                             { name: "businessType", label: "Business Type" },
                             { name: "NTN", label: "NTN" },
                             { name: "contactEmail", label: "Contact Email", type: "email" },
@@ -176,9 +178,9 @@ const StoreSignup = () => {
                                 backgroundColor: "#00796b",
                                 "&:hover": { backgroundColor: "#008080" },
                             }}
-                            href="/seller-dashboard"
+                            href="/store-login"
                         >
-                            Already Register Continue to Dashboard
+                            Already Register Log in to Continue to Dashboard
                         </Button>
                     </form>
                 </CardContent>

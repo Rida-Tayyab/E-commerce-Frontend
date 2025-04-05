@@ -112,6 +112,8 @@ export default function SellerDashboard() {
         credentials: "include"
       });
 
+      console.log(response.cookies);
+
       if (!response.ok) throw new Error(`Failed to ${editMode ? "update" : "add"} ${activeTab}`);
 
       fetchData();
@@ -229,7 +231,7 @@ export default function SellerDashboard() {
                         value={order.status}
                         onChange={(e) => updateOrderStatus(order._id, e.target.value)}
                         fullWidth
-                        sx={{ mt: 2, color: "white",border: "1px solid white" }}
+                        sx={{ mt: 2, color: "white", border: "1px solid white" }}
                       >
                         <MenuItem value="pending">Pending</MenuItem>
                         <MenuItem value="shipped">Shipped</MenuItem>
@@ -278,15 +280,53 @@ export default function SellerDashboard() {
             <TextField label="Category Name" fullWidth margin="dense" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
           ) : (
             <>
-              <TextField label="Name" fullWidth margin="dense" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
-              <TextField label="Price" fullWidth margin="dense" value={formData.price} onChange={(e) => setFormData({ ...formData, price: e.target.value })} />
-              <TextField label="Stock" fullWidth margin="dense" value={formData.stock} onChange={(e) => setFormData({ ...formData, stock: e.target.value })} />
-              <Select fullWidth value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })} displayEmpty >
+              <TextField
+                label="Name"
+                fullWidth
+                margin="dense"
+                value={formData.name || ""} // Ensure value is never undefined
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              />
+              <TextField
+                label="Price"
+                fullWidth
+                margin="dense"
+                value={formData.price || ""} // Ensure value is never undefined
+                onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+              />
+              <TextField
+                label="Stock"
+                fullWidth
+                margin="dense"
+                value={formData.stock || ""} // Ensure value is never undefined
+                onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+              />
+              <Select
+                fullWidth
+                value={formData.category || ""} // Default to an empty string
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                displayEmpty
+              >
                 <MenuItem value="" disabled>Select Category</MenuItem>
-                {categories.map((category) => <MenuItem key={category._id} value={category.name}>{category.name}</MenuItem>)}
+                {categories.map((category) => (
+                  <MenuItem key={category._id} value={category.name}>{category.name}</MenuItem>
+                ))}
               </Select>
-              <TextField label="Description" fullWidth margin="dense" value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
-              <TextField label="Image URL" fullWidth margin="dense" value={formData.imageURL} onChange={(e) => setFormData({ ...formData, imageURL: e.target.value })} />
+              <TextField
+                label="Description"
+                fullWidth
+                margin="dense"
+                value={formData.description || ""} // Ensure value is never undefined
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              />
+              <TextField
+                label="Image URL"
+                fullWidth
+                margin="dense"
+                value={formData.imageURL || ""} // Ensure value is never undefined
+                onChange={(e) => setFormData({ ...formData, imageURL: e.target.value })}
+              />
+
             </>
           )}
         </DialogContent>

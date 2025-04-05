@@ -19,6 +19,7 @@ import ItemDetails from './pages/ItemDetails/index.jsx';
 import Profile from './pages/Profile/index.jsx';
 import SellerDashboard from './pages/SellerDashboard/index.jsx';
 import RegisterStore from './pages/RegisterStore/index.jsx';
+import StoreLogin from './pages/StoreLogin/index.jsx';
 
 const AppContext = React.createContext({});
 
@@ -72,6 +73,10 @@ const router = createBrowserRouter([
     {
         path:"/profile",
         element: <Profile/>,
+    },
+    {
+        path:"/store-login",
+        element: <StoreLogin/>,
     },
     {
         path:"/seller-dashboard",

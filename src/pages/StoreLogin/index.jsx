@@ -7,7 +7,6 @@ import { useTheme } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import back from "../../assets/back.jpg";
 
-
 const StoreLogin = () => {
   const [formData, setFormData] = useState({ ownerEmail: "", password: "" });
   const [message, setMessage] = useState("");
@@ -30,15 +29,15 @@ const StoreLogin = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
+        credentials: "include", // Ensure cookies are sent with the request
       });
 
       const data = await response.json();
       console.log("Login Response:", data); // Debugging log
 
       if (response.ok) {
-        localStorage.setItem("store", JSON.stringify(data.user));
         setMessage("Login successful!");
-        navigate("/seller-dashboard");
+        navigate("/seller-dashboard"); // Redirect to the seller dashboard
       } else {
         setMessage(data.message || "Login failed.");
       }

@@ -109,6 +109,7 @@ export default function SellerDashboard() {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
+        credentials: "include"
       });
 
       if (!response.ok) throw new Error(`Failed to ${editMode ? "update" : "add"} ${activeTab}`);

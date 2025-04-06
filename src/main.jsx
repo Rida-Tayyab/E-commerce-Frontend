@@ -16,10 +16,10 @@ import DashBoard from './pages/DashBoard/index.jsx';
 import Category from './pages/Category/index.jsx';
 import Cart from './pages/Cart/index.jsx';
 import ItemDetails from './pages/ItemDetails/index.jsx';
-import Profile from './pages/Profile/index.jsx';
 import SellerDashboard from './pages/SellerDashboard/index.jsx';
 import RegisterStore from './pages/RegisterStore/index.jsx';
 import StoreLogin from './pages/StoreLogin/index.jsx';
+import Profile from './pages/Profile/index.jsx';
 
 const AppContext = React.createContext({});
 

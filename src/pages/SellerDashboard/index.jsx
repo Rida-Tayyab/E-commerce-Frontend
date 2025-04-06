@@ -19,6 +19,8 @@ import {
   TextField,
   CircularProgress,
   Alert,
+  Modal,
+  Paper,
   Drawer,
   AppBar,
   Toolbar,
@@ -30,12 +32,15 @@ import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import MenuIcon from "@mui/icons-material/Menu";
+import Image from "next/image";
+
 
 export default function SellerDashboard() {
   const [activeTab, setActiveTab] = useState("Order");
   const [orders, setOrders] = useState([]);
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+    const [profileOpen, setProfileOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
@@ -45,6 +50,7 @@ export default function SellerDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const store = JSON.parse(localStorage.getItem("store"));
 
   useEffect(() => {
     fetchData();
@@ -188,6 +194,10 @@ export default function SellerDashboard() {
               Add {activeTab}
             </Button>
           )}
+          <Button variant="contained" sx={{ bgcolor: "#77B0AA", "&:hover": { bgcolor: "#135D66" } }} onClick={() => setProfileOpen(true)}>
+              <Image src={store.image} alt="Profile" style={{ width: 30, height: 30, borderRadius: "50%", marginRight: 8 }} />
+              {store.name}
+          </Button>
         </Toolbar>
       </AppBar>
 
@@ -316,6 +326,16 @@ export default function SellerDashboard() {
           <Button onClick={handleSave} sx={{ color: "#77B0AA" }}>Save</Button>
         </DialogActions>
       </Dialog>
+      <Modal open={profileOpen} onClose={() => setProfileOpen(false)}>
+              <Paper sx={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: 400, p: 3 }}>
+                <Typography variant="h6">Profile</Typography>
+                <Typography><strong>Store Name:</strong> {store.name}</Typography>
+                <Typography><strong>Owner Email:</strong> {store.email}</Typography>
+
+      
+                <Button variant="contained" onClick={() => setProfileOpen(false)} sx={{ mt: 2 }}>Close</Button>
+              </Paper>
+            </Modal>
     </Box>
   );
 }

@@ -36,6 +36,7 @@ const StoreLogin = () => {
       console.log("Login Response:", data); // Debugging log
 
       if (response.ok) {
+        localStorage.setItem("store", JSON.stringify(data.store));
         setMessage("Login successful!");
         navigate("/seller-dashboard"); // Redirect to the seller dashboard
       } else {

@@ -56,7 +56,7 @@ export default function SellerDashboard() {
     setError(null);
 
     try {
-      const response = await fetch("http://localhost:5000/admin/categories");
+      const response = await fetch("http://localhost:5000/store/categories");
       if (!response.ok) throw new Error("Failed to fetch categories");
       const data = await response.json();
       setCategories(data);
@@ -71,13 +71,16 @@ export default function SellerDashboard() {
     setError(null);
 
     const urlMap = {
-      "Order": "http://localhost:5000/admin/order",
-      "Products": "http://localhost:5000/admin/products",
-      "Categories": "http://localhost:5000/admin/categories"
+      "Order": "http://localhost:5000/store/order/store/:id",
+      "Products": "http://localhost:5000/store/products/store/:id",
+      "Categories": "http://localhost:5000/store/categories"
     };
 
     try {
-      const response = await fetch(urlMap[activeTab]);
+      const response = await fetch(urlMap[activeTab],{
+        method: "GET",
+        credentials: "include"
+      });
       if (!response.ok) throw new Error(`Failed to fetch ${activeTab}`);
       const data = await response.json();
       console.log(data);
@@ -94,7 +97,7 @@ export default function SellerDashboard() {
 
   const updateOrderStatus = async (id, newStatus) => {
     try {
-      const response = await fetch(`http://localhost:5000/admin/order/${id}`, {
+      const response = await fetch(`http://localhost:5000/store/order/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
@@ -110,8 +113,8 @@ export default function SellerDashboard() {
 
   const handleSave = async () => {
     const urlMap = {
-      "Products": "http://localhost:5000/admin/products",
-      "Categories": "http://localhost:5000/admin/categories"
+      "Products": "http://localhost:5000/store/products",
+      "Categories": "http://localhost:5000/store/categories"
     };
 
     const url = urlMap[activeTab];
@@ -150,8 +153,8 @@ export default function SellerDashboard() {
 
   const handleDelete = async (id) => {
     const urlMap = {
-      "Products": `http://localhost:5000/admin/products/${id}`,
-      "Categories": `http://localhost:5000/admin/categories/${id}`
+      "Products": `http://localhost:5000/store/products/${id}`,
+      "Categories": `http://localhost:5000/store/categories/${id}`
     };
 
     if (!urlMap[activeTab]) return;

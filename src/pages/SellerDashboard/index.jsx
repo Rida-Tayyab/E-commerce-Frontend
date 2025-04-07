@@ -19,9 +19,9 @@ import {
   TextField,
   CircularProgress,
   Alert,
+  Drawer,
   Modal,
   Paper,
-  Drawer,
   AppBar,
   Toolbar,
   IconButton,
@@ -32,7 +32,7 @@ import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import MenuIcon from "@mui/icons-material/Menu";
-import Image from "next/image";
+
 
 
 export default function SellerDashboard() {
@@ -40,7 +40,7 @@ export default function SellerDashboard() {
   const [orders, setOrders] = useState([]);
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-    const [profileOpen, setProfileOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
@@ -50,12 +50,26 @@ export default function SellerDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const store = JSON.parse(localStorage.getItem("store"));
+  const [store, setStore] = useState(null);
 
   useEffect(() => {
-    fetchData();
+    const stored = localStorage.getItem("store");
+    console.log("Store:", stored);
+    if (stored) {
+      try {
+        setStore(JSON.parse(stored));
+      } catch (e) {
+        console.error("Invalid store data:", e);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (store?._id) {
+      fetchData();
+    }
     fetchCategories();
-  }, [activeTab]);
+  }, [activeTab, store]);
 
   const fetchCategories = async () => {
     setLoading(true);
@@ -73,23 +87,24 @@ export default function SellerDashboard() {
     }
   };
   const fetchData = async () => {
+    if (!store?._id) return; // Wait until store is loaded
+
     setLoading(true);
     setError(null);
 
     const urlMap = {
-      "Order": "http://localhost:5000/store/order/store/:id",
-      "Products": "http://localhost:5000/store/products/store/:id",
+      "Order": `http://localhost:5000/store/order/store/${store._id}`,
+      "Products": `http://localhost:5000/store/products/store/${store._id}`,
       "Categories": "http://localhost:5000/store/categories"
     };
 
     try {
-      const response = await fetch(urlMap[activeTab],{
+      const response = await fetch(urlMap[activeTab], {
         method: "GET",
         credentials: "include"
       });
       if (!response.ok) throw new Error(`Failed to fetch ${activeTab}`);
       const data = await response.json();
-      console.log(data);
 
       if (activeTab === "Order") setOrders(data);
       else if (activeTab === "Products") setProducts(data);
@@ -194,10 +209,23 @@ export default function SellerDashboard() {
               Add {activeTab}
             </Button>
           )}
-          <Button variant="contained" sx={{ bgcolor: "#77B0AA", "&:hover": { bgcolor: "#135D66" } }} onClick={() => setProfileOpen(true)}>
-              <Image src={store.image} alt="Profile" style={{ width: 30, height: 30, borderRadius: "50%", marginRight: 8 }} />
-              {store.name}
-          </Button>
+              {store?.logoUrl && (
+                <IconButton onClick={() => setProfileOpen(true)} sx={{ p: 0 }}>
+                  <Box
+                    component="img"
+                    src={store.logoUrl}
+                    alt="Profile"
+                    sx={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: "50%",
+                      objectFit: "cover",
+                      border: "2px solid #77B0AA",
+                    }}
+                  />
+                </IconButton>
+              )}
+
         </Toolbar>
       </AppBar>
 
@@ -260,7 +288,7 @@ export default function SellerDashboard() {
                         value={order.status}
                         onChange={(e) => updateOrderStatus(order._id, e.target.value)}
                         fullWidth
-                        sx={{ mt: 2, color: "white",border: "1px solid white" }}
+                        sx={{ mt: 2, color: "white", border: "1px solid white" }}
                       >
                         <MenuItem value="pending">Pending</MenuItem>
                         <MenuItem value="shipped">Shipped</MenuItem>
@@ -327,15 +355,25 @@ export default function SellerDashboard() {
         </DialogActions>
       </Dialog>
       <Modal open={profileOpen} onClose={() => setProfileOpen(false)}>
-              <Paper sx={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: 400, p: 3 }}>
-                <Typography variant="h6">Profile</Typography>
-                <Typography><strong>Store Name:</strong> {store.name}</Typography>
-                <Typography><strong>Owner Email:</strong> {store.email}</Typography>
+        <Paper sx={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: 400, p: 3 }}>
+          <Typography variant="h6">Profile</Typography>
+          {!store || !store._id ? (
+            <Typography>Unauthorized. Please log in as a store.</Typography>
+          ) : (
+            <>
+              {store && (
+                <>
+                  <Typography><strong>Store Name:</strong> {store.ownerName}</Typography>
+                  <Typography><strong>Owner Email:</strong> {store.ownerEmail}</Typography>
+                </>
+              )}
 
-      
-                <Button variant="contained" onClick={() => setProfileOpen(false)} sx={{ mt: 2 }}>Close</Button>
-              </Paper>
-            </Modal>
+            </>
+          )}
+
+          <Button variant="contained" onClick={() => setProfileOpen(false)} sx={{ mt: 2 }}>Close</Button>
+        </Paper>
+      </Modal>
     </Box>
   );
 }

@@ -44,7 +44,9 @@ export default function CustomerDashboard() {
   const [cartOpen, setCartOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [orderOpen, setorderOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [shippingAddress, setShippingAddress] = useState("");
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
   const theme = useTheme();
@@ -60,6 +62,7 @@ export default function CustomerDashboard() {
   });
 
   useEffect(() => {
+    console.log("User:", user);
     const fetchProducts = async () => {
       try {
         let url = `http://localhost:5000/customer/products?`;
@@ -208,6 +211,23 @@ export default function CustomerDashboard() {
     }
   };
 
+  const placeOrder = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user._id, shippingAddress }),
+      });
+
+      if (!response.ok) throw new Error("Can't place Order");
+      else {
+        alert("Order placed");
+      }
+    } catch (error) {
+      console.error("Error", error.message);
+      alert("Failed to place order");
+    }
+  };
   const handlePayment = async () => {
     try {
       const response = await fetch("http://localhost:5000/payment/alfalah", {
@@ -248,7 +268,7 @@ export default function CustomerDashboard() {
               <MenuIcon />
             </IconButton>
           )}
-          <Typography variant="h6" sx={{ flexGrow: 1}}>
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>
           </Typography>
           <Box display="flex" alignItems="center" gap={2}>
             <TextField
@@ -384,9 +404,9 @@ export default function CustomerDashboard() {
               variant="contained"
               fullWidth
               sx={{ mt: 2, bgcolor: "#77B0AA", "&:hover": { bgcolor: "#135D66" } }}
-              onClick={() => setCheckoutOpen(true)}
+              onClick={() => setorderOpen(true)}
             >
-              Proceed to Checkout
+              Proceed to place order
             </Button>
           )}
         </Paper>
@@ -425,6 +445,33 @@ export default function CustomerDashboard() {
           )}
 
           <Button variant="contained" onClick={() => setProfileOpen(false)} sx={{ mt: 2 }}>Close</Button>
+        </Paper>
+      </Modal>
+
+      <Modal open={orderOpen} onClose={() => setorderOpen(false)}>
+        <Paper
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            p: 3,
+          }}
+        >
+          <Typography variant="h6">Address Information</Typography>
+
+          <TextField
+            label="Shipping Address"
+            fullWidth
+            margin="normal"
+            value={shippingAddress}
+            onChange={(e) => setShippingAddress(e.target.value)}
+          />
+
+          <Button variant="contained" onClick={placeOrder} sx={{ mt: 2 }}>
+            Place Order
+          </Button>
         </Paper>
       </Modal>
 

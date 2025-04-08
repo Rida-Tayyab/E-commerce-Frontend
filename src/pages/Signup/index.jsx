@@ -4,7 +4,7 @@ import { useTheme } from "@mui/material/styles";
 import back from "../../assets/back.jpg";
 
 const Signup = () => {
-    const [formData, setFormData] = useState({ name: "", email: "", password: "", role: "" });
+    const [formData, setFormData] = useState({ name: "", email: "", password: ""});
     const [message, setMessage] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const theme = useTheme();
@@ -116,25 +116,6 @@ const Signup = () => {
                                     style: { color: "#e0e0e0", backgroundColor: "#2a2a2a", borderRadius: 6 },
                                 }}
                             />
-                        </Box>
-                        <Box mb={3}>
-                            <FormControl fullWidth variant="outlined">
-                                <InputLabel sx={{ color: "#e0e0e0" }}>Role</InputLabel>
-                                <Select
-                                    name="role"
-                                    value={formData.role}
-                                    onChange={handleChange}
-                                    required
-                                    sx={{
-                                        color: "#e0e0e0",
-                                        backgroundColor: "#2a2a2a",
-                                        borderRadius: 6,
-                                    }}
-                                >
-                                    <MenuItem value="User">User</MenuItem>
-                                    <MenuItem value="Seller">Seller</MenuItem>
-                                </Select>
-                            </FormControl>
                         </Box>
                         <Button
                             type="submit"

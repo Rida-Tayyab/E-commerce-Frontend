@@ -50,7 +50,7 @@ export default function CustomerDashboard() {
   const [profileOpen, setProfileOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [orderOpen, setorderOpen] = useState(false);
-  const [paymentOption, setPaymentOption] = useState("Cash on Delivery");
+  const [paymentOption, setPaymentOption] = useState("cod");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [shippingAddress, setShippingAddress] = useState("");
   const navigate = useNavigate();
@@ -494,8 +494,8 @@ export default function CustomerDashboard() {
               value={paymentOption}
               onChange={(e) => setPaymentOption(e.target.value)}
             >
-              <FormControlLabel value="COD" control={<Radio />} label="Cash on Delivery" />
-              <FormControlLabel value="Online" control={<Radio />} label="Online Payment" />
+              <FormControlLabel value="cod" control={<Radio />} label="Cash on Delivery" />
+              <FormControlLabel value="online" control={<Radio />} label="Online Payment" />
             </RadioGroup>
           </FormControl>
 

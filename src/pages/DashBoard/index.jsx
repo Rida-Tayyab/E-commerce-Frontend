@@ -419,7 +419,7 @@ export default function CustomerDashboard() {
       </Modal>
 
       <Modal open={profileOpen} onClose={() => setProfileOpen(false)}>
-        <Paper sx={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: 400, p: 3 }}>
+        <Paper sx={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: 400, p: 3,overflowY: "auto", maxHeight: "80vh" }}>
           <Typography variant="h6">Profile</Typography>
           <Typography><strong>Name:</strong> {user.name}</Typography>
           <Typography><strong>Email:</strong> {user.email}</Typography>
@@ -438,20 +438,33 @@ export default function CustomerDashboard() {
                     secondary={
                       <>
                         <div>Status: {order.status}</div>
-                        <div>Product: {order.products.map((product) => product.name).join(", ")}</div>
-                        <div>Total: Rs. {order.totalAmount} - {new Date(order.createdAt).toLocaleDateString()}</div>
+                        <div>
+                          Products:{" "}
+                          {order.cart?.products?.length > 0
+                            ? order.cart.products
+                              .map((p) =>
+                                p.product ? `${p.product.name} (x${p.quantity})` : "Unknown product"
+                              )
+                              .join(", ")
+                            : "No products found"}
+                        </div>
+                        <div>
+                          Total: Rs. {order.totalAmount} -{" "}
+                          {new Date(order.createdAt).toLocaleDateString()}
+                        </div>
                       </>
                     }
                   />
-                </ListItem>
+                  </ListItem>
               ))}
-            </List>
-          ) : (
-            <Typography>No orders found.</Typography>
+                </List>
+              ) : (
+              <Typography>No orders found.</Typography>
           )}
 
-          <Button variant="contained" onClick={() => setProfileOpen(false)} sx={{ mt: 2 }}>Close</Button>
-        </Paper>
+
+              <Button variant="contained" onClick={() => setProfileOpen(false)} sx={{ mt: 2 }}>Close</Button>
+            </Paper>
       </Modal>
 
       <Modal open={orderOpen} onClose={() => setorderOpen(false)}>

@@ -21,6 +21,11 @@ import {
   AppBar,
   Toolbar,
   useMediaQuery,
+  FormControl,
+  FormLabel,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
   useTheme,
 } from "@mui/material";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
@@ -45,6 +50,7 @@ export default function CustomerDashboard() {
   const [profileOpen, setProfileOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [orderOpen, setorderOpen] = useState(false);
+  const [paymentOption, setPaymentOption] = useState("Cash on Delivery");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [shippingAddress, setShippingAddress] = useState("");
   const navigate = useNavigate();
@@ -216,7 +222,7 @@ export default function CustomerDashboard() {
       const response = await fetch("http://localhost:5000/order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user._id, shippingAddress }),
+        body: JSON.stringify({ userId: user._id, shippingAddress, paymentOption }),
       });
 
       if (!response.ok) throw new Error("Can't place Order");
@@ -459,7 +465,7 @@ export default function CustomerDashboard() {
             p: 3,
           }}
         >
-          <Typography variant="h6">Address Information</Typography>
+          <Typography variant="h6">Order Details</Typography>
 
           <TextField
             label="Shipping Address"
@@ -469,11 +475,29 @@ export default function CustomerDashboard() {
             onChange={(e) => setShippingAddress(e.target.value)}
           />
 
-          <Button variant="contained" onClick={placeOrder} sx={{ mt: 2 }}>
+          <FormControl component="fieldset" sx={{ mt: 2 }}>
+            <FormLabel component="legend">Payment Option</FormLabel>
+            <RadioGroup
+              value={paymentOption}
+              onChange={(e) => setPaymentOption(e.target.value)}
+            >
+              <FormControlLabel value="COD" control={<Radio />} label="Cash on Delivery" />
+              <FormControlLabel value="Online" control={<Radio />} label="Online Payment" />
+            </RadioGroup>
+          </FormControl>
+
+          <Button
+            variant="contained"
+            onClick={placeOrder}
+            fullWidth
+            sx={{ mt: 3 }}
+          >
             Place Order
           </Button>
+
         </Paper>
       </Modal>
+
 
       <Modal open={checkoutOpen} onClose={() => setCheckoutOpen(false)}>
         <Paper sx={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: 400, p: 3 }}>

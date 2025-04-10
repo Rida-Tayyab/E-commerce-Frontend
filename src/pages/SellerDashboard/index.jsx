@@ -91,9 +91,10 @@ export default function SellerDashboard() {
 
     setLoading(true);
     setError(null);
+    console.log(store._id)
 
     const urlMap = {
-      "Order": `http://localhost:5000/store/order/store/${store._id}`,
+      "Order": `http://localhost:5000/order/store/${store._id}`,
       "Products": `http://localhost:5000/store/products/store/${store._id}`,
       "Categories": "http://localhost:5000/store/categories"
     };
@@ -106,7 +107,8 @@ export default function SellerDashboard() {
       if (!response.ok) throw new Error(`Failed to fetch ${activeTab}`);
       const data = await response.json();
 
-      if (activeTab === "Order") setOrders(data);
+      console.log("Data:", data);
+      if (activeTab === "Order") setOrders(data.orders);
       else if (activeTab === "Products") setProducts(data);
       else setCategories(data);
     } catch (error) {
@@ -118,7 +120,7 @@ export default function SellerDashboard() {
 
   const updateOrderStatus = async (id, newStatus) => {
     try {
-      const response = await fetch(`http://localhost:5000/store/order/${id}`, {
+      const response = await fetch(`http://localhost:5000/order/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
@@ -209,22 +211,22 @@ export default function SellerDashboard() {
               Add {activeTab}
             </Button>
           )}
-              {store?.logoUrl && (
-                <IconButton onClick={() => setProfileOpen(true)} sx={{ p: 0 }}>
-                  <Box
-                    component="img"
-                    src={store.logoUrl}
-                    alt="Profile"
-                    sx={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: "50%",
-                      objectFit: "cover",
-                      border: "2px solid #77B0AA",
-                    }}
-                  />
-                </IconButton>
-              )}
+          {store?.logoUrl && (
+            <IconButton onClick={() => setProfileOpen(true)} sx={{ p: 0 }}>
+              <Box
+                component="img"
+                src={store.logoUrl}
+                alt="Profile"
+                sx={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: "50%",
+                  objectFit: "cover",
+                  border: "2px solid #77B0AA",
+                }}
+              />
+            </IconButton>
+          )}
 
         </Toolbar>
       </AppBar>
@@ -271,22 +273,18 @@ export default function SellerDashboard() {
           {loading ? <CircularProgress /> : error ? <Alert severity="error">{error}</Alert> : (
             <Grid container spacing={3} flexGrow={1}>
               {activeTab === "Order" && orders.map((order) => (
-                <Grid item xs={12} sm={6} md={4} key={order._id}>
+                <Grid item xs={12} sm={6} md={4} key={order.orderId + order.storeId}>
                   <Card sx={{ bgcolor: "#1e1e1e", color: "white", p: 2 }}>
                     <CardContent>
-                      <Typography variant="h6">Order #{order._id}</Typography>
-                      <Typography variant="body2">Customer: {order.user?.email}</Typography>
-                      <Typography variant="body2">Status: {order.status}</Typography>
-                      <Typography variant="body2">Total: Rs. {order.totalAmount}</Typography>
-                      <Typography variant="body2">Shipping: {order.shippingAddress}</Typography>
-                      {order.products.map((item, index) => (
-                        <Typography key={index} variant="body2">
-                          {item.quantity}x {item.product?.name || "Unknown"} - Rs. {item.product?.price || "N/A"}
-                        </Typography>
-                      ))}
+                      <Typography variant="h6">Order #{order.orderId}</Typography>
+                      <Typography variant="body2">Store ID: {order.storeId}</Typography>
+                      <Typography variant="body2">Status: {order.storeStatus}</Typography>
+                      <Typography variant="body2">Payment: Rs. {order.paymentAmount}</Typography>
+                      <Typography variant="body2">Updated At: {new Date(order.updatedAt).toLocaleString()}</Typography>
+
                       <Select
-                        value={order.status}
-                        onChange={(e) => updateOrderStatus(order._id, e.target.value)}
+                        value={order.storeStatus}
+                        onChange={(e) => updateOrderStatus(order.orderId, order.storeId, e.target.value)}
                         fullWidth
                         sx={{ mt: 2, color: "white", border: "1px solid white" }}
                       >
@@ -298,6 +296,7 @@ export default function SellerDashboard() {
                   </Card>
                 </Grid>
               ))}
+
 
               {activeTab === "Products" && products.map((product) => (
                 <Grid item xs={12} sm={6} md={4} key={product._id}>

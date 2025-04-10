@@ -29,6 +29,7 @@ import {
   useTheme,
 } from "@mui/material";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import OrderIcon from "@mui/icons-material/ShoppingBasket";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import SearchIcon from "@mui/icons-material/Search";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
@@ -50,6 +51,7 @@ export default function CustomerDashboard() {
   const [profileOpen, setProfileOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [orderOpen, setorderOpen] = useState(false);
+  const [userorderOpen, setuserorderOpen] = useState(false);
   const [paymentOption, setPaymentOption] = useState("cod");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [shippingAddress, setShippingAddress] = useState("");
@@ -107,25 +109,24 @@ export default function CustomerDashboard() {
     fetchCategories();
   }, []);
 
+
+
   useEffect(() => {
     const fetchOrders = async () => {
       if (!user._id) return;
       try {
-        const response = await fetch(`http://localhost:5000/order?userid=${user._id}`);
+        const response = await fetch(`http://localhost:5000/order/user/${user._id}`);
         if (!response.ok) throw new Error("Failed to fetch order history.");
         const data = await response.json();
-        setOrders(data);
+        setOrders(data.orders);
       } catch (error) {
         setError(error.message);
       } finally {
         setLoading(false);
       }
     };
-
-    if (profileOpen) {
-      fetchOrders();
-    }
-  }, [profileOpen]);
+    fetchOrders();
+  }, []);
 
   const addToCart = async (productId) => {
     try {
@@ -291,9 +292,13 @@ export default function CustomerDashboard() {
             <Button variant="contained" sx={{ bgcolor: "#77B0AA", "&:hover": { bgcolor: "#135D66" } }} onClick={fetchCart}>
               <ShoppingCartIcon />
             </Button>
+            <Button variant="contained" sx={{ bgcolor: "#77B0AA", "&:hover": { bgcolor: "#135D66" } }} onClick={() => setuserorderOpen(true)}>
+              <OrderIcon />
+            </Button>
             <Button variant="contained" sx={{ bgcolor: "#77B0AA", "&:hover": { bgcolor: "#135D66" } }} onClick={() => setProfileOpen(true)}>
               <AccountCircleIcon />
             </Button>
+
           </Box>
         </Toolbar>
       </AppBar>
@@ -419,53 +424,65 @@ export default function CustomerDashboard() {
       </Modal>
 
       <Modal open={profileOpen} onClose={() => setProfileOpen(false)}>
-        <Paper sx={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: 400, p: 3,overflowY: "auto", maxHeight: "80vh" }}>
+        <Paper sx={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: 400, p: 3, overflowY: "auto", maxHeight: "80vh" }}>
           <Typography variant="h6">Profile</Typography>
           <Typography><strong>Name:</strong> {user.name}</Typography>
           <Typography><strong>Email:</strong> {user.email}</Typography>
+          <Button variant="contained" onClick={() => setProfileOpen(false)} sx={{ mt: 2 }}>Close</Button>
+        </Paper>
+      </Modal>
 
-          <Typography variant="h6" mt={2}>Order History</Typography>
-          {loading ? (
-            <Typography>Loading...</Typography>
-          ) : error ? (
-            <Typography color="error">{error}</Typography>
-          ) : orders.length > 0 ? (
+
+      <Modal open={userorderOpen} onClose={() => setuserorderOpen(false)}>
+        <Paper
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 500,
+            p: 3,
+            overflowY: "auto",
+            maxHeight: "80vh",
+          }}
+        >
+          <Typography variant="h6" gutterBottom>Orders</Typography>
+          {orders.length > 0 ? (
             <List>
               {orders.map((order, index) => (
-                <ListItem key={index}>
-                  <ListItemText
-                    primary={`Order #${order._id}`}
-                    secondary={
-                      <>
-                        <div>Status: {order.status}</div>
-                        <div>
-                          Products:{" "}
-                          {order.cart?.products?.length > 0
-                            ? order.cart.products
-                              .map((p) =>
-                                p.product ? `${p.product.name} (x${p.quantity})` : "Unknown product"
-                              )
-                              .join(", ")
-                            : "No products found"}
-                        </div>
-                        <div>
-                          Total: Rs. {order.totalAmount} -{" "}
-                          {new Date(order.createdAt).toLocaleDateString()}
-                        </div>
-                      </>
-                    }
-                  />
-                  </ListItem>
+                <ListItem
+                  key={index}
+                  sx={{
+                    flexDirection: "column",
+                    alignItems: "flex-start",
+                    borderBottom: "1px solid #ccc",
+                    mb: 1,
+                    pb: 1,
+                  }}
+                >
+                  <Typography fontWeight="bold">Order ID: {order[0]}</Typography>
+                  <Typography>Status: {order[1]}</Typography>
+                  <Typography>Shipping: {order[2]}</Typography>
+                  <Typography>Placed On: {new Date(order[3]).toLocaleString()}</Typography>
+                  <Typography>Last Updated: {new Date(order[4]).toLocaleString()}</Typography>
+                  <Typography>Payment Method: {order[5]}</Typography>
+                </ListItem>
               ))}
-                </List>
-              ) : (
-              <Typography>No orders found.</Typography>
+            </List>
+          ) : (
+            <Typography>No orders found.</Typography>
           )}
 
-
-              <Button variant="contained" onClick={() => setProfileOpen(false)} sx={{ mt: 2 }}>Close</Button>
-            </Paper>
+          <Button
+            variant="contained"
+            onClick={() => setuserorderOpen(false)}
+            sx={{ mt: 2 }}
+          >
+            Close
+          </Button>
+        </Paper>
       </Modal>
+
 
       <Modal open={orderOpen} onClose={() => setorderOpen(false)}>
         <Paper

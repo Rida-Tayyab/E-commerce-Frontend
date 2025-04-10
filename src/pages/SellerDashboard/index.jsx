@@ -118,12 +118,13 @@ export default function SellerDashboard() {
     }
   };
 
-  const updateOrderStatus = async (id, newStatus) => {
+  const updateOrderStatus = async (id,storeId, newStatus) => {
     try {
+      console.log("Updating order status:", id, newStatus);
       const response = await fetch(`http://localhost:5000/order/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: newStatus }),
+        body: JSON.stringify({ status: newStatus,storeId}),
       });
 
       if (!response.ok) throw new Error("Failed to update order status");

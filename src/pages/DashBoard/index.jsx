@@ -93,6 +93,7 @@ export default function CustomerDashboard() {
       }
     };
     fetchProducts();
+    fetchOrders();
   }, [category, search]);
 
   useEffect(() => {
@@ -110,23 +111,19 @@ export default function CustomerDashboard() {
   }, []);
 
 
-
-  useEffect(() => {
-    const fetchOrders = async () => {
-      if (!user._id) return;
-      try {
-        const response = await fetch(`http://localhost:5000/order/user/${user._id}`);
-        if (!response.ok) throw new Error("Failed to fetch order history.");
-        const data = await response.json();
-        setOrders(data.orders);
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchOrders();
-  }, []);
+  const fetchOrders = async () => {
+    if (!user._id) return;
+    try {
+      const response = await fetch(`http://localhost:5000/order/user/${user._id}`);
+      if (!response.ok) throw new Error("Failed to fetch order history.");
+      const data = await response.json();
+      setOrders(data.orders);
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const addToCart = async (productId) => {
     try {
@@ -217,7 +214,6 @@ export default function CustomerDashboard() {
       console.error("Error removing item:", error);
     }
   };
-
   const placeOrder = async () => {
     try {
       const response = await fetch("http://localhost:5000/order", {
@@ -229,12 +225,34 @@ export default function CustomerDashboard() {
       if (!response.ok) throw new Error("Can't place Order");
       else {
         alert("Order placed");
+        fetchOrders();
       }
     } catch (error) {
       console.error("Error", error.message);
       alert("Failed to place order");
     }
   };
+
+  const deleteOrder = async (orderId) => {
+    try {
+      const response = await fetch(`http://localhost:5000/order/${orderId}`, {
+        method: 'DELETE',
+      });
+  
+      const data = await response.json();
+  
+      if (!response.ok) {
+        alert(data.message || 'An error occurred while deleting the order.');
+      } else {
+        alert(data.message || 'Order deleted successfully.');
+        fetchOrders();
+      }
+    } catch (error) {
+      console.error("Error deleting order:", error);
+      alert("There was an error processing your request. Please try again.");
+    }
+  };
+  
   const handlePayment = async () => {
     try {
       const response = await fetch("http://localhost:5000/payment/alfalah", {
@@ -460,14 +478,36 @@ export default function CustomerDashboard() {
                     pb: 1,
                   }}
                 >
-                  <Typography fontWeight="bold">Order ID: {order[0]}</Typography>
-                  <Typography>Status: {order[1]}</Typography>
-                  <Typography>Shipping: {order[2]}</Typography>
-                  <Typography>Placed On: {new Date(order[3]).toLocaleString()}</Typography>
-                  <Typography>Last Updated: {new Date(order[4]).toLocaleString()}</Typography>
-                  <Typography>Payment Method: {order[5]}</Typography>
+                  <Box display="flex" justifyContent="space-between" width="100%">
+                  <div>
+                  <Typography fontWeight="bold">Order ID: {order.orderDetails.orderId}</Typography>
+                  <Typography>Status: {order.orderDetails.status}</Typography>
+                  <Typography>Shipping Address: {order.orderDetails.shippingAddress}</Typography>
+                  <Typography>Placed On: {new Date(order.orderDetails.createdAt).toLocaleString()}</Typography>
+                  <Typography>Last Updated: {new Date(order.orderDetails.updatedAt).toLocaleString()}</Typography>
+                  <Typography>Payment Method: {order.orderDetails.paymentMethod}</Typography>
+
+                  {/* Check if cart exists and display product details */}
+                  {order.cart && order.cart.products && order.cart.products.length > 0 && (
+                    <div style={{ marginTop: "10px" }}>
+                      <Typography variant="subtitle2">Products in Cart:</Typography>
+                      {order.cart.products.map((product, productIndex) => (
+                        <Typography key={productIndex}>
+                          Product Name: {product.name} - Quantity: {product.quantity} - Total: {product.total}
+                        </Typography>
+                      ))}
+                    </div>
+                  )}
+                  </div>
+                  <div>
+                  <IconButton color="error" onClick={() => deleteOrder(order.orderDetails.orderId)}>
+                      <DeleteIcon />
+                    </IconButton>
+                    </div>
+                  </Box>
                 </ListItem>
               ))}
+
             </List>
           ) : (
             <Typography>No orders found.</Typography>
@@ -482,7 +522,6 @@ export default function CustomerDashboard() {
           </Button>
         </Paper>
       </Modal>
-
 
       <Modal open={orderOpen} onClose={() => setorderOpen(false)}>
         <Paper

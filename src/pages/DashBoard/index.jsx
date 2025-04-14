@@ -83,8 +83,10 @@ export default function CustomerDashboard() {
         }
 
         const response = await fetch(url);
+        console.log("Response:", response);
         if (!response.ok) throw new Error("Failed to fetch products.");
         const data = await response.json();
+        console.log("Products:", data);
         setProducts(data);
       } catch (error) {
         setError("Failed to fetch products.");
@@ -100,6 +102,7 @@ export default function CustomerDashboard() {
     const fetchCategories = async () => {
       try {
         const response = await fetch("http://localhost:5000/customer/categories");
+        console.log("Categories Response:", response);
         if (!response.ok) throw new Error("Failed to fetch categories.");
         const data = await response.json();
         setCategories(["All Categories", ...data.map(cat => cat.name)]);

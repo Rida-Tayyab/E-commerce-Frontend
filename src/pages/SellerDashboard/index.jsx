@@ -146,6 +146,8 @@ export default function SellerDashboard() {
 
     const method = editMode ? "PUT" : "POST";
     const endpoint = editMode ? `${url}/${selectedId}` : url;
+    console.log("FormData being sent:", formData);
+
 
     try {
       const response = await fetch(endpoint, {
@@ -156,7 +158,7 @@ export default function SellerDashboard() {
       });
 
       console.log(response.cookies);
-
+      console.log(response)
       if (!response.ok) throw new Error(`Failed to ${editMode ? "update" : "add"} ${activeTab}`);
 
       fetchData();
@@ -169,11 +171,19 @@ export default function SellerDashboard() {
   };
 
   const handleEdit = (item) => {
-    setFormData(item);
+    setFormData({
+      name: item.name || "",
+      description: item.description || "",
+      price: item.price || "",
+      category: item.category || "",
+      stock: item.stock || "",
+      image: item.image || ""
+    });
     setEditMode(true);
     setSelectedId(item._id);
     setOpenDialog(true);
   };
+  
 
   const handleDelete = async (id) => {
     const urlMap = {
@@ -185,6 +195,7 @@ export default function SellerDashboard() {
 
     try {
       const response = await fetch(urlMap[activeTab], { method: "DELETE" });
+      console.log("Response:", response);
 
       if (!response.ok) throw new Error(`Failed to delete ${activeTab}`);
 
@@ -345,7 +356,7 @@ export default function SellerDashboard() {
                 {categories.map((category) => <MenuItem key={category._id} value={category.name}>{category.name}</MenuItem>)}
               </Select>
               <TextField label="Description" fullWidth margin="dense" value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
-              <TextField label="Image URL" fullWidth margin="dense" value={formData.imageURL} onChange={(e) => setFormData({ ...formData, imageURL: e.target.value })} />
+              <TextField label="Image URL" fullWidth margin="dense" value={formData.image} onChange={(e) => setFormData({ ...formData, image: e.target.value })} />
             </>
           )}
         </DialogContent>

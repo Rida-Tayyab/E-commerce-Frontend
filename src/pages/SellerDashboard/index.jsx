@@ -32,8 +32,32 @@ import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import MenuIcon from "@mui/icons-material/Menu";
+import AnalyticsIcon from "@mui/icons-material/Analytics";
+import { Bar, Line } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  PointElement,
+  LineElement,
+} from "chart.js";
 
 
+// Register ChartJS components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  PointElement,
+  LineElement
+);
 
 export default function SellerDashboard() {
   const [activeTab, setActiveTab] = useState("Order");
@@ -41,6 +65,7 @@ export default function SellerDashboard() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [analyticsOpen, setAnalyticsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
@@ -51,6 +76,15 @@ export default function SellerDashboard() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [store, setStore] = useState(null);
+
+  // Analytics data states
+  const [totalRevenue, setTotalRevenue] = useState(0);
+  const [totalOrders, setTotalOrders] = useState(0);
+  const [salesOverTime, setSalesOverTime] = useState([]);
+  const [ratingsOverTime, setRatingsOverTime] = useState([]);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
+
+
 
   useEffect(() => {
     const stored = localStorage.getItem("store");
@@ -118,13 +152,86 @@ export default function SellerDashboard() {
     }
   };
 
-  const updateOrderStatus = async (id,storeId, newStatus) => {
+  useEffect(() => {
+    console.log('Sales Data:', salesOverTime);
+    console.log('Ratings Data:', ratingsOverTime);
+  }, [salesOverTime, ratingsOverTime]);
+  //here 
+  const fetchAnalyticsData = async () => {
+    if (!store?._id) return;
+
+    setAnalyticsLoading(true);
+    try {
+      // Fetch all analytics data in parallel
+      const [revenueRes, ordersRes, salesRes, ratingsRes] = await Promise.all([
+        fetch(`http://localhost:5000/analytics/total-revenue/${store._id}`),
+        fetch(`http://localhost:5000/analytics/total-orders/${store._id}`),
+        fetch(`http://localhost:5000/analytics/sales-over-time/${store._id}`),
+        fetch(`http://localhost:5000/analytics/ratings-over-time/${store._id}`)
+      ]);
+
+      if (!revenueRes.ok) throw new Error("Failed to fetch revenue data");
+      if (!ordersRes.ok) throw new Error("Failed to fetch orders data");
+      if (!salesRes.ok) throw new Error("Failed to fetch sales data");
+      if (!ratingsRes.ok) throw new Error("Failed to fetch ratings data");
+
+      const revenueData = await revenueRes.json();
+      const ordersData = await ordersRes.json();
+      const salesData = await salesRes.json();
+      const ratingsData = await ratingsRes.json();
+
+      setTotalRevenue(revenueData.totalRevenue);
+      setTotalOrders(ordersData.totalOrders);
+      setSalesOverTime(salesData);
+      setRatingsOverTime(ratingsData);
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setAnalyticsLoading(false);
+    }
+  };
+
+  const handleAnalyticsOpen = () => {
+    setAnalyticsOpen(true);
+    fetchAnalyticsData();
+  };
+
+  // Prepare chart data
+  // Prepare chart data
+  const salesChartData = {
+    labels: salesOverTime?.map(item => item.MONTH) || [],
+    datasets: [
+      {
+        label: "Sales Amount",
+        data: salesOverTime?.map(item => item.TOTAL_AMOUNT) || [],
+        backgroundColor: "rgba(119, 176, 170, 0.5)",
+        borderColor: "rgba(119, 176, 170, 1)",
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const ratingsChartData = {
+    labels: ratingsOverTime?.map(item => item.month) || [],
+    datasets: [
+      {
+        label: "Average Rating",
+        data: ratingsOverTime?.map(item => parseFloat(item.averageRating)) || [],
+        backgroundColor: "rgba(255, 206, 86, 0.5)",
+        borderColor: "rgba(255, 206, 86, 1)",
+        borderWidth: 1,
+        tension: 0.1,
+      },
+    ],
+  };
+
+  const updateOrderStatus = async (id, storeId, newStatus) => {
     try {
       console.log("Updating order status:", id, newStatus);
       const response = await fetch(`http://localhost:5000/order/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: newStatus,storeId}),
+        body: JSON.stringify({ status: newStatus, storeId }),
       });
 
       if (!response.ok) throw new Error("Failed to update order status");
@@ -183,7 +290,7 @@ export default function SellerDashboard() {
     setSelectedId(item._id);
     setOpenDialog(true);
   };
-  
+
 
   const handleDelete = async (id) => {
     const urlMap = {
@@ -216,8 +323,15 @@ export default function SellerDashboard() {
             </IconButton>
           )}
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            Admin Dashboard
+            Store Dashboard
           </Typography>
+          <Button
+            startIcon={<AnalyticsIcon />}
+            onClick={handleAnalyticsOpen}
+            sx={{ color: "#77B0AA", mr: 2 }}
+          >
+            Analytics
+          </Button>
           {activeTab !== "Order" && (
             <Button startIcon={<AddIcon />} onClick={() => setOpenDialog(true)} sx={{ color: "#77B0AA" }}>
               Add {activeTab}
@@ -385,6 +499,188 @@ export default function SellerDashboard() {
           <Button variant="contained" onClick={() => setProfileOpen(false)} sx={{ mt: 2 }}>Close</Button>
         </Paper>
       </Modal>
+      <Modal open={analyticsOpen} onClose={() => setAnalyticsOpen(false)}>
+        <Paper sx={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: "80%",
+          maxWidth: 1000,
+          p: 3,
+          bgcolor: "#1e1e1e",
+          color: "white",
+          maxHeight: "90vh",
+          overflowY: "auto"
+        }}>
+          <Typography variant="h5" mb={3} textAlign="center">
+            Store Analytics
+          </Typography>
+
+          {analyticsLoading ? (
+            <Box display="flex" justifyContent="center" my={4}>
+              <CircularProgress />
+            </Box>
+          ) : error ? (
+            <Alert severity="error">{error}</Alert>
+          ) : (
+            <>
+
+              <Grid container spacing={3}>
+                {/* Summary Cards */}
+                <Grid item xs={12} md={6}>
+                  <Card sx={{ bgcolor: "#2d2d2d", p: 2 }}>
+                    <CardContent>
+                      <Typography variant="h6">Total Revenue</Typography>
+                      <Typography variant="h4" color="#77B0AA">
+                        Rs. {totalRevenue?.toLocaleString() || 0}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+
+                <Grid item xs={12} md={6}>
+                  <Card sx={{ bgcolor: "#2d2d2d", p: 2 }}>
+                    <CardContent>
+                      <Typography variant="h6">Total Orders</Typography>
+                      <Typography variant="h4" color="#77B0AA">
+                        {totalOrders?.toLocaleString() || 0}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+
+                {/* Sales Over Time Chart */}
+                <Grid item xs={12}>
+                  <Card sx={{ bgcolor: "#2d2d2d", p: 2 }}>
+                    <CardContent>
+                      <Typography variant="h6" mb={2}>Sales Over Time</Typography>
+                      <Box height={300}>
+                        {salesOverTime?.length > 0 ? (
+                          <div style={{ height: '100%' }}>
+                            <Bar
+                              data={salesChartData}
+                              options={{
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                  legend: {
+                                    position: 'top',
+                                    labels: {
+                                      color: 'white'
+                                    }
+                                  },
+                                  tooltip: {
+                                    callbacks: {
+                                      label: function (context) {
+                                        return `Rs. ${context.raw.toLocaleString()}`;
+                                      }
+                                    }
+                                  }
+                                },
+                                scales: {
+                                  x: {
+                                    ticks: {
+                                      color: 'white'
+                                    },
+                                    grid: {
+                                      color: 'rgba(255, 255, 255, 0.1)'
+                                    }
+                                  },
+                                  y: {
+                                    ticks: {
+                                      color: 'white',
+                                      callback: function (value) {
+                                        return `Rs. ${value.toLocaleString()}`;
+                                      }
+                                    },
+                                    grid: {
+                                      color: 'rgba(255, 255, 255, 0.1)'
+                                    }
+                                  }
+                                }
+                              }}
+                            />
+                          </div>
+                        ) : (
+                          <Box height="100%" display="flex" alignItems="center" justifyContent="center">
+                            <Typography>No sales data available</Typography>
+                          </Box>
+                        )}
+                      </Box>
+                    </CardContent>
+                  </Card>
+                </Grid>
+
+                {/* Ratings Over Time Chart */}
+                <Grid item xs={12}>
+                  <Card sx={{ bgcolor: "#2d2d2d", p: 2 }}>
+                    <CardContent>
+                      <Typography variant="h6" mb={2}>Ratings Over Time</Typography>
+                      <Box height={300}>
+                        {ratingsOverTime?.length > 0 ? (
+                          <div style={{ height: '100%' }}>
+                            <Line
+                              data={ratingsChartData}
+                              options={{
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                  legend: {
+                                    position: 'top',
+                                    labels: {
+                                      color: 'white'
+                                    }
+                                  }
+                                },
+                                scales: {
+                                  x: {
+                                    ticks: {
+                                      color: 'white'
+                                    },
+                                    grid: {
+                                      color: 'rgba(255, 255, 255, 0.1)'
+                                    }
+                                  },
+                                  y: {
+                                    min: 0,
+                                    max: 5,
+                                    ticks: {
+                                      color: 'white',
+                                      stepSize: 0.5
+                                    },
+                                    grid: {
+                                      color: 'rgba(255, 255, 255, 0.1)'
+                                    }
+                                  }
+                                }
+                              }}
+                            />
+                          </div>
+                        ) : (
+                          <Box height="100%" display="flex" alignItems="center" justifyContent="center">
+                            <Typography>No ratings data available</Typography>
+                          </Box>
+                        )}
+                      </Box>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              </Grid>
+            </>
+          )}
+
+          <Box mt={3} display="flex" justifyContent="flex-end">
+            <Button
+              onClick={() => setAnalyticsOpen(false)}
+              sx={{ color: "#77B0AA" }}
+            >
+              Close
+            </Button>
+          </Box>
+        </Paper>
+      </Modal>
+
     </Box>
   );
 }
